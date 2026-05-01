@@ -1,12 +1,18 @@
 package org.uj.project.tidarobot.user.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.uj.project.tidarobot.exception.UserNotFoundException;
 import org.uj.project.tidarobot.user.dto.UpdateUserRequest;
+import org.uj.project.tidarobot.user.dto.UserResponse;
+import org.uj.project.tidarobot.user.entity.Role;
 import org.uj.project.tidarobot.user.entity.Status;
 import org.uj.project.tidarobot.user.entity.User;
 import org.uj.project.tidarobot.user.repository.UserRepository;
+import org.uj.project.tidarobot.user.repository.UserSpecification;
 
 @Service
 public class UserService {
@@ -50,5 +56,25 @@ public class UserService {
 
     public void deleteUser(Long userId) {
         userRepository.deleteById(userId);
+    }
+
+    public Page<UserResponse> getUsers(Pageable pageable, Role role, Status status, String username) {
+        Specification<User> spec = Specification
+                .where(UserSpecification.hasRole(role))
+                .and(UserSpecification.hasStatus(status))
+                .and(UserSpecification.usernameContains(username));
+
+        return userRepository.findAll(spec, pageable).map(this::toUserResponse);
+    }
+
+    private UserResponse toUserResponse(User user) {
+        return new UserResponse(
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getRole(),
+                user.getStatus(),
+                user.getCreatedAt()
+        );
     }
 }
