@@ -30,6 +30,7 @@ public class SecurityConfig {
                                 .requestMatchers("/auth/**").permitAll()
                                 .requestMatchers("/admin/**").hasRole(Role.ADMIN.toString())
                                 .requestMatchers("/parking/**").authenticated()
+                                .requestMatchers("/stats/**").authenticated()
                         .anyRequest().permitAll()
                 )
                 .sessionManagement(session ->
