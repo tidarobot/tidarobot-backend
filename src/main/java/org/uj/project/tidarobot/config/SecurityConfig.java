@@ -29,8 +29,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                                 .requestMatchers("/auth/**").permitAll()
                                 .requestMatchers("/admin/**").hasRole(Role.ADMIN.toString())
-                        //TODO: set correct request
-//                        .requestMatchers("/api/profile/**").authenticated()
+                                .requestMatchers("/parking/**").authenticated()
                         .anyRequest().permitAll()
                 )
                 .sessionManagement(session ->
