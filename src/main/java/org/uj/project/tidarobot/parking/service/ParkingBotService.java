@@ -27,7 +27,8 @@ public class ParkingBotService {
 
             // TODO: invoke Python script here, e.g.:
             // ProcessBuilder pb = new ProcessBuilder("python", "reserve.py", ...args);
-            // pb.start().waitFor();
+            // Process result = pb.start(); result.waitFor();
+            // TODO: if the script reports no spot available, set WAITLISTED instead of COMPLETED
 
             reservation.setStatus(ReservationStatus.COMPLETED);
             log.info("[MOCK] Reservation {} completed successfully", reservation.getId());

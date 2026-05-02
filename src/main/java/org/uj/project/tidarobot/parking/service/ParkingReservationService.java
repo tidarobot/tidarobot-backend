@@ -13,7 +13,6 @@ import org.uj.project.tidarobot.parking.entity.ReservationStatus;
 import org.uj.project.tidarobot.parking.repository.ParkingReservationRepository;
 import org.uj.project.tidarobot.user.entity.User;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -31,19 +30,13 @@ public class ParkingReservationService {
     private int triggerHour;
 
     public ParkingReservationResponse createReservation(User user, ParkingReservationRequest request) {
-        if (isWeekend(request.targetDate())) {
-            throw new InvalidReservationException("Target date must be a working day (Monday–Friday)");
+        if (request.targetDate().isBefore(LocalDate.now())) {
+            throw new InvalidReservationException("Cannot reserve a parking space for a past date");
         }
 
         validateFloorForCity(request.city(), request.floor().name());
 
-        LocalDate triggerDate = subtractWorkingDays(request.targetDate(), daysBefore);
-        LocalDateTime scheduledFor = triggerDate.atTime(triggerHour, 0);
-
-        if (!scheduledFor.isAfter(LocalDateTime.now())) {
-            throw new InvalidReservationException(
-                    "Registration window has already opened for this date (trigger time: " + scheduledFor + ")");
-        }
+        LocalDateTime scheduledFor = calculateScheduledFor(request.targetDate());
 
         ParkingReservation reservation = ParkingReservation.builder()
                 .user(user)
@@ -56,6 +49,14 @@ public class ParkingReservationService {
                 .build();
 
         return toResponse(reservationRepository.save(reservation));
+    }
+
+    // Trigger opens 6 calendar days before the target date at triggerHour.
+    // If that moment is already past, the bot should fire immediately.
+    private LocalDateTime calculateScheduledFor(LocalDate targetDate) {
+        LocalDateTime triggerTime = targetDate.minusDays(6).atTime(triggerHour, 0);
+        LocalDateTime now = LocalDateTime.now();
+        return triggerTime.isAfter(now) ? triggerTime : now;
     }
 
     public List<ParkingReservationResponse> getUserReservations(User user) {
@@ -87,23 +88,6 @@ public class ParkingReservationService {
             throw new InvalidReservationException("Warsaw floor configuration is not yet available");
         }
         // Cracow supports all current Floor values — no additional check needed
-    }
-
-    private boolean isWeekend(LocalDate date) {
-        DayOfWeek day = date.getDayOfWeek();
-        return day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY;
-    }
-
-    private LocalDate subtractWorkingDays(LocalDate date, int workingDays) {
-        LocalDate result = date;
-        int subtracted = 0;
-        while (subtracted < workingDays) {
-            result = result.minusDays(1);
-            if (!isWeekend(result)) {
-                subtracted++;
-            }
-        }
-        return result;
     }
 
     private ParkingReservationResponse toResponse(ParkingReservation r) {
