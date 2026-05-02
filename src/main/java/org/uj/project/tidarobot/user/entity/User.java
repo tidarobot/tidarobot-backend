@@ -33,6 +33,8 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Status status;
     private LocalDateTime createdAt;
+    private String loginTidaro;
+    private String passwordTidaro;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

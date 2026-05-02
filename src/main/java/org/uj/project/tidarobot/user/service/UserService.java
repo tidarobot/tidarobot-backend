@@ -51,6 +51,14 @@ public class UserService {
             user.setPasswordHash(passwordEncoder.encode(request.password()));
         }
 
+        if(request.loginTidaro() != null) {
+            user.setLoginTidaro(request.loginTidaro());
+        }
+
+        if(request.passwordTidaro() != null) {
+            user.setPasswordTidaro(request.passwordTidaro());
+        }
+
         return userRepository.save(user);
     }
 

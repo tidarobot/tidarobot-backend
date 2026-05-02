@@ -40,6 +40,8 @@ public class AuthService {
                 .username(request.username())
                 .email(request.email())
                 .passwordHash(passwordEncoder.encode(request.password()))
+                .loginTidaro(request.loginTidaro())
+                .passwordTidaro(request.passwordTidaro())
                 .role(Role.USER)
                 .status(Status.PENDING)
                 .createdAt(LocalDateTime.now())
