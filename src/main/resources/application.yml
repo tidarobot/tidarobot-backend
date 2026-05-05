@@ -1,6 +1,14 @@
 spring:
-  profiles:
-    active: prod
+  datasource:
+    url: jdbc:postgresql://localhost:5432/tidarobot
+    username: username
+    password: password
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
 jwt:
   secret: ${JWT_SECRET}
 parking:
