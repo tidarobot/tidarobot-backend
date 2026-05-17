@@ -20,7 +20,7 @@ public class ParkingScheduler {
     private final ParkingReservationRepository reservationRepository;
     private final ParkingBotService parkingBotService;
 
-    @Scheduled(fixedDelay = 60_000)
+    @Scheduled(fixedDelay = 10_000)
     public void triggerDueReservations() {
         List<ParkingReservation> due = reservationRepository
                 .findAllByStatusAndScheduledForBefore(ReservationStatus.SCHEDULED, LocalDateTime.now());

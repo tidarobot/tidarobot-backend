@@ -33,6 +33,7 @@ def create_driver(headless=True):
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
+    options.add_argument("--window-size=1920,1080")
     return webdriver.Chrome(options=options)
 
 
@@ -90,12 +91,14 @@ class ParkingBot:
         logging.info("Clicked: Book a spot")
 
     def _open_spot_area_dropdown(self):
-        picker = self.wait.until(
-            EC.presence_of_element_located((By.ID, "parking-spot-zones"))
+        self.wait.until(
+            EC.visibility_of_element_located((By.ID, "parking-spot-zones"))
         )
-        container = picker.find_element(By.CLASS_NAME, "dropdown__container")
-        main_link = container.find_element(By.CLASS_NAME, "dropdown__main")
-        main_link.click()
+        main_link = self.wait.until(
+            EC.element_to_be_clickable((By.CSS_SELECTOR, "#parking-spot-zones .dropdown__main"))
+        )
+        self.driver.execute_script("arguments[0].scrollIntoView(true);", main_link)
+        self.driver.execute_script("arguments[0].click();", main_link)
         logging.info("Dropdown opened")
 
     def _click_dropdown_option(self, parking_area):
