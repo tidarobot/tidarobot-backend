@@ -13,6 +13,9 @@ import org.uj.project.tidarobot.parking.entity.ReservationStatus;
 import org.uj.project.tidarobot.parking.repository.ParkingReservationRepository;
 import org.uj.project.tidarobot.user.entity.User;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -59,11 +62,18 @@ public class ParkingReservationService {
         return triggerTime.isAfter(now) ? triggerTime : now;
     }
 
-    public List<ParkingReservationResponse> getUserReservations(User user) {
-        return reservationRepository.findAllByUserId(user.getId())
+    public List<ParkingReservationResponse> getLatestReservations(User user) {
+        return reservationRepository.findTop5ByUserIdOrderByCreatedAtDesc(user.getId())
                 .stream()
                 .map(this::toResponse)
                 .toList();
+    }
+
+    public Page<ParkingReservationResponse> getReservationHistory(User user, Pageable pageable) {
+        return switch (user.getRole()){
+            case ADMIN -> reservationRepository.findAll(pageable).map(this::toResponse);
+            case USER -> reservationRepository.findAllByUserId(user.getId(), pageable).map(this::toResponse);
+        };
     }
 
     public void cancelReservation(User user, Long reservationId) {

@@ -2,6 +2,9 @@ package org.uj.project.tidarobot.parking.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -30,10 +33,18 @@ public class ParkingController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ParkingReservationResponse>> getUserReservations(
+    public ResponseEntity<List<ParkingReservationResponse>> getLatestReservations(
             @AuthenticationPrincipal User user
     ) {
-        return ResponseEntity.ok(reservationService.getUserReservations(user));
+        return ResponseEntity.ok(reservationService.getLatestReservations(user));
+    }
+
+    @GetMapping("/history")
+    public ResponseEntity<Page<ParkingReservationResponse>> getReservationHistory(
+            @AuthenticationPrincipal User user,
+            @PageableDefault(sort = "createdAt", direction = org.springframework.data.domain.Sort.Direction.DESC) Pageable pageable
+    ) {
+        return ResponseEntity.ok(reservationService.getReservationHistory(user, pageable));
     }
 
     @DeleteMapping("/{id}")
