@@ -8,6 +8,7 @@ import org.uj.project.tidarobot.auth.dto.AuthResponse;
 import org.uj.project.tidarobot.auth.dto.LoginRequest;
 import org.uj.project.tidarobot.auth.dto.RegisterRequest;
 import org.uj.project.tidarobot.exception.UserExistsException;
+import org.uj.project.tidarobot.security.EncryptionService;
 import org.uj.project.tidarobot.user.entity.Role;
 import org.uj.project.tidarobot.user.entity.Status;
 import org.uj.project.tidarobot.user.entity.User;
@@ -22,12 +23,14 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final EncryptionService encryptionService;
 
-    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager) {
+    public AuthService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService, AuthenticationManager authenticationManager, EncryptionService encryptionService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
+        this.encryptionService = encryptionService;
     }
 
     public AuthResponse register(RegisterRequest request) {
@@ -41,7 +44,7 @@ public class AuthService {
                 .email(request.email())
                 .passwordHash(passwordEncoder.encode(request.password()))
                 .loginTidaro(request.loginTidaro())
-                .passwordTidaro(request.passwordTidaro())
+                .passwordTidaro(encryptionService.encrypt(request.passwordTidaro()))
                 .role(Role.USER)
                 .status(Status.PENDING)
                 .createdAt(LocalDateTime.now())

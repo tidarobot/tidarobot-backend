@@ -6,6 +6,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.uj.project.tidarobot.exception.UserNotFoundException;
+import org.uj.project.tidarobot.security.EncryptionService;
 import org.uj.project.tidarobot.user.dto.UpdateUserRequest;
 import org.uj.project.tidarobot.user.dto.UserResponse;
 import org.uj.project.tidarobot.user.entity.Role;
@@ -19,10 +20,12 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EncryptionService encryptionService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, EncryptionService encryptionService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.encryptionService = encryptionService;
     }
 
     public void updateUserStatus(Long userId, Status status) {
@@ -56,7 +59,7 @@ public class UserService {
         }
 
         if(request.passwordTidaro() != null) {
-            user.setPasswordTidaro(request.passwordTidaro());
+            user.setPasswordTidaro(encryptionService.encrypt(request.passwordTidaro()));
         }
 
         return userRepository.save(user);

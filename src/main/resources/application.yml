@@ -11,6 +11,10 @@ spring:
     show-sql: true
 jwt:
   secret: ${JWT_SECRET}
+encryption:
+  secret: ${ENCRYPTION_KEY}
 parking:
   days-before: 6
   trigger-hour: 16
+  python-executable: python
+  python-script-path: src/main/resources/login.py

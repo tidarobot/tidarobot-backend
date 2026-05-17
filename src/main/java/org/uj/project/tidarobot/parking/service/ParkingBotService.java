@@ -8,6 +8,7 @@ import org.uj.project.tidarobot.parking.entity.Floor;
 import org.uj.project.tidarobot.parking.entity.ParkingReservation;
 import org.uj.project.tidarobot.parking.entity.ReservationStatus;
 import org.uj.project.tidarobot.parking.repository.ParkingReservationRepository;
+import org.uj.project.tidarobot.security.EncryptionService;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -35,6 +36,7 @@ public class ParkingBotService {
     private String scriptPath;
 
     private final ParkingReservationRepository reservationRepository;
+    private final EncryptionService encryptionService;
 
     public void execute(ParkingReservation reservation) {
         reservation.setStatus(ReservationStatus.IN_PROGRESS);
@@ -51,10 +53,14 @@ public class ParkingBotService {
                     reservation.getFloor(),
                     reservation.getTargetDate());
 
+            String encryptedTidaroPassword = reservation.getUser().getPasswordTidaro();
+            String decryptedTidaroPassword = encryptionService.decrypt(encryptedTidaroPassword);
+
+
             ProcessBuilder pb = new ProcessBuilder(
                     pythonExecutable, scriptPath,
                     "--email",        reservation.getUser().getLoginTidaro(),
-                    "--password",     reservation.getUser().getPasswordTidaro(),
+                    "--password",     decryptedTidaroPassword,
                     "--parking-area", parkingArea,
                     "--day",          day,
                     "--month",        month
