@@ -13,11 +13,16 @@ import org.uj.project.tidarobot.parking.entity.ReservationStatus;
 import org.uj.project.tidarobot.parking.repository.ParkingReservationRepository;
 import org.uj.project.tidarobot.user.entity.User;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.uj.project.tidarobot.config.CacheConfig;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -32,6 +37,12 @@ public class ParkingReservationService {
     @Value("${parking.trigger-hour}")
     private int triggerHour;
 
+    @Caching(evict = {
+            @CacheEvict(value = CacheConfig.STATS_DAYS,   allEntries = true),
+            @CacheEvict(value = CacheConfig.STATS_USERS,  allEntries = true),
+            @CacheEvict(value = CacheConfig.STATS_FLOORS, allEntries = true),
+            @CacheEvict(value = CacheConfig.USER_LATEST_RESERVATIONS, key = "#user.id")
+    })
     public ParkingReservationResponse createReservation(User user, ParkingReservationRequest request) {
         if (request.targetDate().isBefore(LocalDate.now())) {
             throw new InvalidReservationException("Cannot reserve a parking space for a past date");
@@ -54,19 +65,18 @@ public class ParkingReservationService {
         return toResponse(reservationRepository.save(reservation));
     }
 
-    // Trigger opens 6 calendar days before the target date at triggerHour.
-    // If that moment is already past, the bot should fire immediately.
     private LocalDateTime calculateScheduledFor(LocalDate targetDate) {
-        LocalDateTime triggerTime = targetDate.minusDays(6).atTime(triggerHour, 0);
+        LocalDateTime triggerTime = targetDate.minusDays(daysBefore).atTime(triggerHour, 0);
         LocalDateTime now = LocalDateTime.now();
         return triggerTime.isAfter(now) ? triggerTime : now;
     }
 
+    @Cacheable(value = CacheConfig.USER_LATEST_RESERVATIONS, key = "#user.id")
     public List<ParkingReservationResponse> getLatestReservations(User user) {
-        return reservationRepository.findTop5ByUserIdOrderByCreatedAtDesc(user.getId())
+        return new ArrayList<>(reservationRepository.findTop5ByUserIdOrderByCreatedAtDesc(user.getId())
                 .stream()
                 .map(this::toResponse)
-                .toList();
+                .toList());
     }
 
     public Page<ParkingReservationResponse> getReservationHistory(User user, Pageable pageable) {
@@ -76,6 +86,12 @@ public class ParkingReservationService {
         };
     }
 
+    @Caching(evict = {
+            @CacheEvict(value = CacheConfig.STATS_DAYS,   allEntries = true),
+            @CacheEvict(value = CacheConfig.STATS_USERS,  allEntries = true),
+            @CacheEvict(value = CacheConfig.STATS_FLOORS, allEntries = true),
+            @CacheEvict(value = CacheConfig.USER_LATEST_RESERVATIONS, key = "#user.id")
+    })
     public void cancelReservation(User user, Long reservationId) {
         ParkingReservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new UserNotFoundException("Reservation " + reservationId + " not found"));

@@ -181,8 +181,10 @@ def main():
     parser.add_argument("--no-headless", action="store_true", help="Run browser visibly for debugging")
     args = parser.parse_args()
 
-    driver = create_driver(headless=not args.no_headless)
+    logging.info("Starting bot: day=%s month=%s area=%s headless=%s", args.day, args.month, args.parking_area, not args.no_headless)
+    driver = None
     try:
+        driver = create_driver(headless=not args.no_headless)
         bot = ParkingBot(driver)
         exit_code = bot.run(
             args.email,
@@ -195,7 +197,8 @@ def main():
         logging.exception("Bot failed: %s", e)
         exit_code = EXIT_FAILED
     finally:
-        driver.quit()
+        if driver is not None:
+            driver.quit()
 
     sys.exit(exit_code)
 

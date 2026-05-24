@@ -3,7 +3,10 @@ package org.uj.project.tidarobot.parking.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
+import org.uj.project.tidarobot.config.CacheConfig;
 import org.uj.project.tidarobot.parking.entity.Floor;
 import org.uj.project.tidarobot.parking.entity.ParkingReservation;
 import org.uj.project.tidarobot.parking.entity.ReservationStatus;
@@ -38,6 +41,12 @@ public class ParkingBotService {
     private final ParkingReservationRepository reservationRepository;
     private final EncryptionService encryptionService;
 
+    @Caching(evict = {
+            @CacheEvict(value = CacheConfig.STATS_DAYS,   allEntries = true),
+            @CacheEvict(value = CacheConfig.STATS_USERS,  allEntries = true),
+            @CacheEvict(value = CacheConfig.STATS_FLOORS, allEntries = true),
+            @CacheEvict(value = CacheConfig.USER_LATEST_RESERVATIONS, key = "#reservation.user.id")
+    })
     public void execute(ParkingReservation reservation) {
         reservation.setStatus(ReservationStatus.IN_PROGRESS);
         reservationRepository.save(reservation);
@@ -63,7 +72,8 @@ public class ParkingBotService {
                     "--password",     decryptedTidaroPassword,
                     "--parking-area", parkingArea,
                     "--day",          day,
-                    "--month",        month
+                    "--month",        month,
+                    "--no-headless"
             );
             pb.redirectErrorStream(true);
             Process process = pb.start();
