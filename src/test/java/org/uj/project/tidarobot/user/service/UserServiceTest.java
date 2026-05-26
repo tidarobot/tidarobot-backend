@@ -182,7 +182,7 @@ class UserServiceTest {
         Page<UserResponse> result = userService.getUsers(PageRequest.of(0, 10), Role.USER, Status.APPROVED, "alice");
 
         assertThat(result).hasSize(1);
-        UserResponse response = result.getContent().get(0);
+        UserResponse response = result.getContent().getFirst();
         assertThat(response.id()).isEqualTo(5L);
         assertThat(response.username()).isEqualTo("alice");
         assertThat(response.email()).isEqualTo("alice@test.com");

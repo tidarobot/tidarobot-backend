@@ -130,7 +130,7 @@ class ParkingReservationRepositoryTest {
                 .findAllByStatusAndScheduledForBefore(ReservationStatus.SCHEDULED, threshold);
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).getStatus()).isEqualTo(ReservationStatus.SCHEDULED);
+        assertThat(result.getFirst().getStatus()).isEqualTo(ReservationStatus.SCHEDULED);
     }
 
     @Test
@@ -141,7 +141,7 @@ class ParkingReservationRepositoryTest {
         List<ParkingReservation> result = reservationRepository
                 .findAllByStatusAndScheduledForBefore(ReservationStatus.SCHEDULED, LocalDateTime.now());
 
-        assertThat(result.get(0).getUser().getUsername()).isEqualTo("user1");
+        assertThat(result.getFirst().getUser().getUsername()).isEqualTo("user1");
     }
 
     // --- helpers ---

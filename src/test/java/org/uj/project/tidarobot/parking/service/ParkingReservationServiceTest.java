@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -216,12 +215,12 @@ class ParkingReservationServiceTest {
         List<ParkingReservationResponse> result = service.getLatestReservations(user);
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).id()).isEqualTo(10L);
-        assertThat(result.get(0).username()).isEqualTo("testuser");
-        assertThat(result.get(0).city()).isEqualTo(City.CRACOW);
-        assertThat(result.get(0).floor()).isEqualTo(Floor.MINUS_1);
-        assertThat(result.get(0).targetDate()).isEqualTo(targetDate);
-        assertThat(result.get(0).status()).isEqualTo(ReservationStatus.SCHEDULED);
+        assertThat(result.getFirst().id()).isEqualTo(10L);
+        assertThat(result.getFirst().username()).isEqualTo("testuser");
+        assertThat(result.getFirst().city()).isEqualTo(City.CRACOW);
+        assertThat(result.getFirst().floor()).isEqualTo(Floor.MINUS_1);
+        assertThat(result.getFirst().targetDate()).isEqualTo(targetDate);
+        assertThat(result.getFirst().status()).isEqualTo(ReservationStatus.SCHEDULED);
     }
 
     // --- getReservationHistory ---

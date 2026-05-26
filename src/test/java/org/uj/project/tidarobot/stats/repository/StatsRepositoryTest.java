@@ -82,7 +82,7 @@ class StatsRepositoryTest {
         List<DayRankingEntry> result = statsRepository.findDayRanking(City.CRACOW, null, null, null);
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).reservationCount()).isEqualTo(1L);
+        assertThat(result.getFirst().reservationCount()).isEqualTo(1L);
     }
 
     @Test
@@ -94,7 +94,7 @@ class StatsRepositoryTest {
         List<DayRankingEntry> result = statsRepository.findDayRanking(null, ReservationStatus.COMPLETED, null, null);
 
         assertThat(result).hasSize(1);
-        assertThat(result.get(0).reservationCount()).isEqualTo(1L);
+        assertThat(result.getFirst().reservationCount()).isEqualTo(1L);
     }
 
     @Test

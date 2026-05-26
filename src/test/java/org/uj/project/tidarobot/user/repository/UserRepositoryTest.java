@@ -79,7 +79,7 @@ class UserRepositoryTest {
         Page<User> result = userRepository.findAll(UserSpecification.hasRole(Role.USER), PageRequest.of(0, 10));
 
         assertThat(result.getContent()).hasSize(1);
-        assertThat(result.getContent().get(0).getUsername()).isEqualTo("alice");
+        assertThat(result.getContent().getFirst().getUsername()).isEqualTo("alice");
     }
 
     @Test
@@ -90,7 +90,7 @@ class UserRepositoryTest {
         Page<User> result = userRepository.findAll(UserSpecification.hasStatus(Status.PENDING), PageRequest.of(0, 10));
 
         assertThat(result.getContent()).hasSize(1);
-        assertThat(result.getContent().get(0).getUsername()).isEqualTo("bob");
+        assertThat(result.getContent().getFirst().getUsername()).isEqualTo("bob");
     }
 
     @Test
@@ -121,7 +121,7 @@ class UserRepositoryTest {
         Page<User> result = userRepository.findAll(spec, PageRequest.of(0, 10));
 
         assertThat(result.getContent()).hasSize(1);
-        assertThat(result.getContent().get(0).getUsername()).isEqualTo("alice");
+        assertThat(result.getContent().getFirst().getUsername()).isEqualTo("alice");
     }
 
     @Test
