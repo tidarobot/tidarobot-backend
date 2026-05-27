@@ -72,8 +72,7 @@ public class ParkingBotService {
                     "--password",     decryptedTidaroPassword,
                     "--parking-area", parkingArea,
                     "--day",          day,
-                    "--month",        month,
-                    "--no-headless"
+                    "--month",        month
             );
             pb.redirectErrorStream(true);
             Process process = pb.start();

@@ -20,19 +20,31 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.uj.project.tidarobot.config.CacheConfig;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class ParkingReservationService {
 
-    private final ParkingReservationRepository reservationRepository;
+    // Calendar days to subtract from the target date to get the trigger date.
+    // Friday opens on Monday (4 days before); all other weekdays open on their
+    // preceding Tuesday/Wednesday/Thursday/Friday, which spans the weekend (+6 days).
+    private static final Map<DayOfWeek, Integer> TRIGGER_OFFSET_BY_TARGET_DAY = Map.of(
+            DayOfWeek.MONDAY,    6,
+            DayOfWeek.TUESDAY,   6,
+            DayOfWeek.WEDNESDAY, 6,
+            DayOfWeek.THURSDAY,  6,
+            DayOfWeek.FRIDAY,    4,
+            DayOfWeek.SATURDAY,  4,
+            DayOfWeek.SUNDAY,    5
+    );
 
-    @Value("${parking.days-before}")
-    private int daysBefore;
+    private final ParkingReservationRepository reservationRepository;
 
     @Value("${parking.trigger-hour}")
     private int triggerHour;
@@ -66,7 +78,8 @@ public class ParkingReservationService {
     }
 
     private LocalDateTime calculateScheduledFor(LocalDate targetDate) {
-        LocalDateTime triggerTime = targetDate.minusDays(daysBefore).atTime(triggerHour, 0);
+        int offset = TRIGGER_OFFSET_BY_TARGET_DAY.get(targetDate.getDayOfWeek());
+        LocalDateTime triggerTime = targetDate.minusDays(offset).atTime(triggerHour, 0);
         LocalDateTime now = LocalDateTime.now();
         return triggerTime.isAfter(now) ? triggerTime : now;
     }

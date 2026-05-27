@@ -34,6 +34,11 @@ def create_driver(headless=True):
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--disable-gpu")
     options.add_argument("--window-size=1920,1080")
+    # Alpine Linux ships Chromium at this path
+    import os
+    chromium_path = "/usr/bin/chromium-browser"
+    if os.path.exists(chromium_path):
+        options.binary_location = chromium_path
     return webdriver.Chrome(options=options)
 
 
