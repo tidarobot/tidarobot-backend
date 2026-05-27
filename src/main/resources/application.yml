@@ -18,7 +18,6 @@ jwt:
 encryption:
   secret: ${ENCRYPTION_KEY}
 parking:
-  days-before: 6
   trigger-hour: 16
-  python-executable: python
+  python-executable: python3
   python-script-path: src/main/resources/login.py
