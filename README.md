@@ -31,11 +31,12 @@ cp .env.example .env
 
 ```env
 JWT_SECRET=your_secret_key_here
+ENCRYPTION_KEY=your_encryption_key_here
 DB_USERNAME=your_db_username
 DB_PASSWORD=your_db_password
 ```
 
-> `JWT_SECRET` should be a long random string (at least 32 characters).
+> `JWT_SECRET` should be a long random string (at least 32 characters). `ENCRYPTION_KEY` is used to encrypt Tidaro credentials stored in the database and should also be a long random string (at least 32 characters).
 
 ### 3. Start the application
 
@@ -45,5 +46,5 @@ docker-compose up --build
 ```
 
 The app will be available at:
-- Frontend: http://localhost
+- Frontend: http://localhost:80
 - Backend API: http://localhost:8080
