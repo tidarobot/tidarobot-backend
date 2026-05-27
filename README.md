@@ -17,8 +17,8 @@ projects/
 ```
 
 ```bash
-git clone https://github.com/tidarobot/tidarobot-backend tidaroBot
-git clone https://github.com/tidarobot/tidarobot-frontend tidaroBotFrontend
+git clone https://github.com/tidarobot/tidarobot-backend
+git clone https://github.com/tidarobot/tidarobot-frontend
 ```
 
 ### 2. Configure environment variables
